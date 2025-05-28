@@ -1,23 +1,41 @@
-export async function getServerSideProps(context) {
-  const { slug } = context.params;
-  const searchParams = context.req.url.split('?')[1] || '';
+// pages/[...slug].js
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
 
-  // Construct the path from slug array
-  const path = Array.isArray(slug) ? slug.join('/') : '';
-  
-  // Build destination URL
-  const baseUrl = 'https://mtinpad.com/r?';
-  const destination = `${baseUrl}${path}${searchParams ? `&${searchParams}` : ''}`;
+const RedirectPage = () => {
+  const router = useRouter();
+  const { slug } = router.query;
 
+  useEffect(() => {
+    if (!router.isReady) return;
+
+    // Get path segments
+    const path = Array.isArray(slug) ? slug.join('/') : '';
+    
+    // Get existing query parameters
+    const searchParams = new URLSearchParams(window.location.search);
+    
+    // Build destination URL
+    const baseUrl = 'https://mtinpad.com/r?';
+    const destination = `${baseUrl}${path}${searchParams.toString() ? `&${searchParams.toString()}` : ''}`;
+    
+    // Perform redirect
+    window.location.replace(destination);
+  }, [router.isReady, slug]);
+
+  return <div style={{ padding: 20 }}>Redirecting...</div>;
+};
+
+// Required for static export but can be empty
+export async function getStaticPaths() {
   return {
-    redirect: {
-      destination,
-      permanent: false, // Set to true for 301 redirect
-    },
+    paths: [],
+    fallback: 'blocking' // or 'true' if you want client-side fallback
   };
 }
 
-// Empty component since we're redirecting server-side
-export default function RedirectPage() {
-  return null;
+export async function getStaticProps() {
+  return { props: {} };
 }
+
+export default RedirectPage;
