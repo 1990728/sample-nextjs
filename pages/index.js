@@ -11,7 +11,7 @@ export default function CatchAllPage() {
       ? router.asPath.slice(1) 
       : router.asPath;
 
-    // Redirect to xxxx.com/r?[path]
+    
     window.location.replace(`https://mtinpad.com/r?${path}`);
   }, [router]);
 
